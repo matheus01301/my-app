@@ -153,19 +153,14 @@ export default function Card({ size = "sm", indicator, onDelete, onUpdate }: Car
     return (
         <>
             <StyledCard style={{ borderColor: borderColor, animation: animation, backgroundColor: '#09090A' }} type={indicator.type as any} isAlarmActive={borderColor === 'red'}>
-                {indicator.isLeftColumn ? (
-                    <>
-                        {console.log('Indicator value:', indicator.value)}
-                        <MainTitle>{indicator.value}</MainTitle>
-                    </>
-                ) : (
-                    <>
-                        <Title>{indicator.title}</Title>
-                        <MainTitle>{indicator.title}</MainTitle>
-                    </>
-                )}
+            {indicator.isLeftColumn ? (
+                <MainTitle>{indicator.value}</MainTitle>
+            ) : (
+                <>
+                    <MainTitle>{indicator.value}</MainTitle>
+                </>
+            )}
             </StyledCard>
         </>
     );
 }
-
