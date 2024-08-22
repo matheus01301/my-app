@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": false, // Continua a emitir arquivos mesmo se houver erros de compilação.
+    "strict": false, // Desativa todas as opções de verificação de tipo rigorosas.
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": false, // Permite expressões e declarações com um tipo 'any' implícito.
+    "strictNullChecks": false, // Não verifica se os valores nulos e undefined estão sendo tratados corretamente.
+    "strictFunctionTypes": false, // Desativa a verificação rigorosa de tipos em funções.
+    "strictBindCallApply": false, // Desativa a verificação rigorosa para os métodos bind, call e apply.
+    "strictPropertyInitialization": false, // Desativa a verificação de que as propriedades da classe foram inicializadas no construtor.
+    "skipLibCheck": true // Pula a verificação de tipos em todas as declarações de bibliotecas (*.d.ts).
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
