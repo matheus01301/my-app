@@ -7,7 +7,7 @@ if (typeof window !== 'undefined') {
     ipcRenderer = window.require('electron').ipcRenderer;
 }
 
-const LoginContainer = styled('div', {
+const Container = styled('div', {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -16,7 +16,7 @@ const LoginContainer = styled('div', {
   backgroundColor: '#09090A',
 });
 
-const LoginBox = styled('div', {
+const Box = styled('div', {
   backgroundColor: '#ffffff',
   padding: '40px',
   borderRadius: '10px',
@@ -62,11 +62,27 @@ const ErrorMessage = styled('div', {
   marginTop: '10px',
 });
 
-export default function Login() {
+export default function AuthScreen() {
   const [username, setUsername] = useState('');
   const [matricula, setMatricula] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isCreatingUser, setIsCreatingUser] = useState(false); // Estado para alternar entre login e criação de usuário
+
+  const handleLogin = async () => {
+    if (username === '' || password === '') {
+      setError('Username e Password são obrigatórios');
+      return;
+    }
+
+    try {
+      // Sua lógica de login
+      ipcRenderer.send('load-main'); // Agora, pode-se carregar a interface principal
+    } catch (error) {
+      console.error('Erro durante o login:', error);
+      setError('Login falhou. Verifique suas credenciais.');
+    }
+  };
 
   const handleCreateUser = async () => {
     if (username === '' || matricula === '' || password === '') {
@@ -78,6 +94,7 @@ export default function Login() {
       const matriculaInt = parseInt(matricula, 10);  // Converte matricula para número
       await createUser(username, matriculaInt, password);
       alert('Usuário criado com sucesso!');
+      setIsCreatingUser(false); // Volta para a tela de login
     } catch (error) {
       console.error('Erro durante a criação do usuário:', error);
       setError('Falha na criação do usuário.');
@@ -85,30 +102,39 @@ export default function Login() {
   };
 
   return (
-    <LoginContainer>
-      <LoginBox>
-        <Title>Criar Usuário</Title>
+    <Container>
+      <Box>
+        <Title>{isCreatingUser ? 'Criar Usuário' : 'Login'}</Title>
         <Input
           type="text"
-          placeholder="Nome"
+          placeholder={isCreatingUser ? "Nome" : "Username"}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <Input
-          type="text"
-          placeholder="Matrícula"
-          value={matricula}
-          onChange={(e) => setMatricula(e.target.value)}
-        />
+        {isCreatingUser && (
+          <Input
+            type="text"
+            placeholder="Matrícula"
+            value={matricula}
+            onChange={(e) => setMatricula(e.target.value)}
+          />
+        )}
         <Input
           type="password"
-          placeholder="Senha"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button onClick={handleCreateUser}>Criar Usuário</Button>
+        {isCreatingUser ? (
+          <Button onClick={handleCreateUser}>Criar Usuário</Button>
+        ) : (
+          <Button onClick={handleLogin}>Entrar</Button>
+        )}
         {error && <ErrorMessage>{error}</ErrorMessage>}
-      </LoginBox>
-    </LoginContainer>
+        <Button onClick={() => setIsCreatingUser(!isCreatingUser)}>
+          {isCreatingUser ? 'Voltar para Login' : 'Criar uma conta'}
+        </Button>
+      </Box>
+    </Container>
   );
 }

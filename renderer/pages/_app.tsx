@@ -6,6 +6,7 @@ import ComponentLayout from '../src/components/layout/Layout';
 import "antd/dist/antd.dark.css";
 import { AlarmProvider } from '../src/components/Context/AlarmContext';
 import { ConfigProvider } from 'antd';
+import { IndicatorsProvider } from '../src/components/Context/IndicatorsContext';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -16,6 +17,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <ConfigProvider>
+      <IndicatorsProvider>
         <AlarmProvider>
           {showLayout ? (
             <ComponentLayout>
@@ -25,6 +27,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
             <Component {...pageProps} />
           )}
         </AlarmProvider>
+      </IndicatorsProvider>
     </ConfigProvider>
   );
 };
