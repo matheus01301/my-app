@@ -9,6 +9,7 @@
     "dev": "nextron",
     "test": "jest",
     "build": "nextron build",
+    "build:win64": "nextron build --win --x64",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {

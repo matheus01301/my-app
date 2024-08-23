@@ -62,6 +62,7 @@ const EditableCell: React.FC<{
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false);
+  {/* @ts-ignore */}
   const inputRef = useRef<InputRef>(null);
   const form = useContext(EditableContext)!;
 
@@ -142,6 +143,7 @@ const TableSala: React.FC<TableSalaProps> = ({ data, properties }) => {
 
   const handleSave = (row: Sala) => {
     const newData = [...dataSource];
+    {/* @ts-ignore */}
     const index = newData.findIndex((item) => row.key === item.key);
     if (index > -1) {
       const item = newData[index];
@@ -179,12 +181,6 @@ const TableSala: React.FC<TableSalaProps> = ({ data, properties }) => {
     {
       title: 'Ação',
       dataIndex: 'operation',
-      render: (_, record) =>
-        dataSource.length >= 1 ? (
-          <Popconfirm title="Confirma a exclusão?" onConfirm={() => handleDelete(record.key)}>
-            <a>Delete</a>
-          </Popconfirm>
-        ) : null,
     },
   ];
 

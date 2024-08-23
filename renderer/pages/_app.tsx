@@ -18,6 +18,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <ConfigProvider>
       <IndicatorsProvider>
+        {/* @ts-ignore */}
         <AlarmProvider>
           {showLayout ? (
             <ComponentLayout>

@@ -44,7 +44,7 @@ export const IndicatorsProvider = ({ children }: IndicatorsProviderProps) => {
             ...indicator,
             color: config?.indicatorColors?.find(i => i.property === indicator.property)?.color || '#141414',
         }));
-
+{/* @ts-ignore */}
         const initializedData = createDataWithCustomValues(dataObjects);
         setIndicatorsData(initializedData);
         console.log('Indicators initialized:', initializedData);

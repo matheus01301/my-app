@@ -152,6 +152,7 @@ export default function Card({ size = "sm", indicator, onDelete, onUpdate }: Car
 
     return (
         <>
+        {/* @ts-ignore */}
             <StyledCard style={{ borderColor: borderColor, animation: animation, backgroundColor: '#09090A' }} type={indicator.type as any} isAlarmActive={borderColor === 'red'}>
             {indicator.isLeftColumn ? (
                 <MainTitle>{indicator.value}</MainTitle>

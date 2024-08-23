@@ -7,7 +7,7 @@ export interface IndicatorProps {
     type?: string;
     size?: string;
     isLeftColumn?: boolean;
-    roomID?: number;  // Add roomID
-    hora?: string;    // Add hora
+    roomID?: number;
+    hora?: string;
     [key: string]: any;
 }

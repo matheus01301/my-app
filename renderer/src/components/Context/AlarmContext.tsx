@@ -33,7 +33,7 @@ const AlarmContext = createContext<AlarmContextType>(defaultContextValue);
 export const useAlarmContext = () => {
     return useContext(AlarmContext);
 };
-
+{/* @ts-ignore */}
 export const AlarmProvider: React.FC = ({ children }) => {
     const [alarms, setAlarms] = useState<Alarm[]>([]);
     const [alarmLogs, setAlarmLogs] = useState([]);
