@@ -75,9 +75,9 @@ export default function AuthScreen() {
     }
 
     try {
-      const response = await loginUser(username, password); // Chama a função de login
-      localStorage.setItem('token', response.access_token); // Armazena o token JWT no localStorage
-      ipcRenderer.send('load-main'); // Agora, pode-se carregar a interface principal
+      const response = await loginUser(username, password);
+      localStorage.setItem('token', response.access_token);
+      ipcRenderer.send('load-main');
     } catch (error) {
       console.error('Erro durante o login:', error);
       setError('Login falhou. Verifique suas credenciais.');
@@ -91,12 +91,12 @@ export default function AuthScreen() {
     }
   
     try {
-      const matricula = Math.floor(Math.random() * 1000000000); // Exemplo para gerar uma matrícula aleatória
+      const matricula = Math.floor(Math.random() * 1000000000);
       const response = await createUser(username, matricula, password);
   
       if (response && response.id_usuario) {
         alert('Usuário criado com sucesso!');
-        setIsCreatingUser(false); // Volta para a tela de login
+        setIsCreatingUser(false);
       } else {
         setError('Falha na criação do usuário. Resposta inesperada do servidor.');
       }

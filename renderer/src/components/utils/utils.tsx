@@ -153,7 +153,6 @@ export async function fetchRoom(roomId: number) {
       }
 
       const data = await response.json();
-      console.log('Room data:', data);
       return data;
   } catch (error) {
       console.error('Error fetching room data:', error);
@@ -230,6 +229,31 @@ export async function getCurrentUser() {
   }
 }
 
+export async function deleteRoomHorario(roomId: number, horario: string) {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`http://127.0.0.1:8000/room/room/${roomId}/horario?horario=${horario}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Inclui o token no cabeçalho
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete room horario');
+    }
+
+    const data = await response.json();
+    console.log('Room horario deleted successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error deleting room horario:', error);
+    throw error;
+  }
+}
+
 export const timeSlots = [
   "07:00 - 07:50",
   "07:50 - 08:40",
@@ -282,159 +306,152 @@ export const initialIndicators = [
   { id: 'hour0', title: 'Horas', property: 'hora', customValue: 'Horário', unit: '', fator: 1, isLeftColumn: true },
 
   // Primeiro grupo de indicadores normais
-  { id: 'sala1', title: 'Sala 1', property: 'temp', customValue: 'Sala 1', unit: 'C', fator: 1, hora: '07:00', roomID: 1 },
-  { id: 'sala2', title: 'Sala 2', property: 'pressure', customValue: 'Sala 2', unit: 'hPa', fator: 1, hora: '07:00', roomID: 2 },
-  { id: 'sala3', title: 'Sala 3', property: 'humidity', customValue: 'Sala 3', unit: '%', fator: 1, hora: '07:00', roomID: 3 },
-  { id: 'sala4', title: 'Sala 4', property: 'wind', customValue: 'Sala 4', unit: 'km/h', fator: 1, hora: '07:00', roomID: 4 },
+  { id: 'sala1', title: 'Sala 1', property: 'temp', customValue: 'Sala 1', unit: 'C', fator: 1, hora: '', roomID: 1 },
+  { id: 'sala2', title: 'Sala 2', property: 'pressure', customValue: 'Sala 2', unit: 'hPa', fator: 1, hora: '', roomID: 2 },
+  { id: 'sala3', title: 'Sala 3', property: 'humidity', customValue: 'Sala 3', unit: '%', fator: 1, hora: '', roomID: 3 },
+  { id: 'sala4', title: 'Sala 4', property: 'wind', customValue: 'Sala 4', unit: 'km/h', fator: 1, hora: '', roomID: 4 },
 
   // Início com o horário (07:00 - 07:50)
   { id: 'hour1', title: 'Horas', property: 'hora', customValue: '07:00 - 07:50', unit: '', fator: 1, isLeftColumn: true },
 
   // Primeiro grupo de indicadores normais
-  { id: 'indicator1', title: 'Temperature', property: 'temp', customValue: 25, unit: 'C', fator: 1, hora: '07:00', roomID: 1 },
-  { id: 'indicator2', title: 'Pressure', property: 'pressure', customValue: 1013, unit: 'hPa', fator: 1, hora: '07:00', roomID: 2 },
-  { id: 'indicator3', title: 'Humidity', property: 'humidity', customValue: 55, unit: '%', fator: 1, hora: '07:00', roomID: 3 },
-  { id: 'indicator4', title: 'Wind Speed', property: 'wind', customValue: 12, unit: 'km/h', fator: 1, hora: '07:00', roomID: 4 },
+  { id: 'indicator1', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '07:00', roomID: 1 },
+  { id: 'indicator2', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '07:00', roomID: 2 },
+  { id: 'indicator3', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '07:00', roomID: 3 },
+  { id: 'indicator4', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '07:00', roomID: 4 },
 
   // Segundo horário (07:50 - 08:40)
   { id: 'hour2', title: 'Horas', property: 'hora', customValue: '07:50 - 08:40', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator5', title: 'Temperature', property: 'temp', customValue: 26, unit: 'C', fator: 1, hora: '07:50', roomID: 1 },
-  { id: 'indicator6', title: 'Pressure', property: 'pressure', customValue: 1012, unit: 'hPa', fator: 1, hora: '07:50', roomID: 2 },
-  { id: 'indicator7', title: 'Humidity', property: 'humidity', customValue: 60, unit: '%', fator: 1, hora: '07:50', roomID: 3 },
-  { id: 'indicator8', title: 'Wind Speed', property: 'wind', customValue: 14, unit: 'km/h', fator: 1, hora: '07:50', roomID: 4 },
+  { id: 'indicator5', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '07:50', roomID: 1 },
+  { id: 'indicator6', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '07:50', roomID: 2 },
+  { id: 'indicator7', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '07:50', roomID: 3 },
+  { id: 'indicator8', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '07:50', roomID: 4 },
 
   // Terceiro horário (08:55 - 09:45)
   { id: 'hour3', title: 'Horas', property: 'hora', customValue: '08:55 - 09:45', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator9', title: 'Temperature', property: 'temp', customValue: 27, unit: 'C', fator: 1, hora: '08:55', roomID: 1 },
-  { id: 'indicator10', title: 'Pressure', property: 'pressure', customValue: 1011, unit: 'hPa', fator: 1, hora: '08:55', roomID: 2 },
-  { id: 'indicator11', title: 'Humidity', property: 'humidity', customValue: 65, unit: '%', fator: 1, hora: '08:55', roomID: 3 },
-  { id: 'indicator12', title: 'Wind Speed', property: 'wind', customValue: 15, unit: 'km/h', fator: 1, hora: '08:55', roomID: 4 },
+  { id: 'indicator9', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '08:55', roomID: 1 },
+  { id: 'indicator10', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '08:55', roomID: 2 },
+  { id: 'indicator11', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '08:55', roomID: 3 },
+  { id: 'indicator12', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '08:55', roomID: 4 },
 
   // Quarto horário (09:45 - 10:35)
   { id: 'hour4', title: 'Horas', property: 'hora', customValue: '09:45 - 10:35', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator13', title: 'Temperature', property: 'temp', customValue: 28, unit: 'C', fator: 1, hora: '09:45', roomID: 1 },
-  { id: 'indicator14', title: 'Pressure', property: 'pressure', customValue: 1010, unit: 'hPa', fator: 1, hora: '09:45', roomID: 2 },
-  { id: 'indicator15', title: 'Humidity', property: 'humidity', customValue: 70, unit: '%', fator: 1, hora: '09:45', roomID: 3 },
-  { id: 'indicator16', title: 'Wind Speed', property: 'wind', customValue: 18, unit: 'km/h', fator: 1, hora: '09:45', roomID: 4 },
+  { id: 'indicator13', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '09:45', roomID: 1 },
+  { id: 'indicator14', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '09:45', roomID: 2 },
+  { id: 'indicator15', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '09:45', roomID: 3 },
+  { id: 'indicator16', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '09:45', roomID: 4 },
 
   // Quinto horário (10:50 - 11:40)
   { id: 'hour5', title: 'Horas', property: 'hora', customValue: '10:50 - 11:40', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator17', title: 'Temperature', property: 'temp', customValue: 29, unit: 'C', fator: 1, hora: '10:50', roomID: 1 },
-  { id: 'indicator18', title: 'Pressure', property: 'pressure', customValue: 1009, unit: 'hPa', fator: 1, hora: '10:50', roomID: 2 },
-  { id: 'indicator19', title: 'Humidity', property: 'humidity', customValue: 72, unit: '%', fator: 1, hora: '10:50', roomID: 3 },
-  { id: 'indicator20', title: 'Wind Speed', property: 'wind', customValue: 20, unit: 'km/h', fator: 1, hora: '10:50', roomID: 4 },
+  { id: 'indicator17', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '10:50', roomID: 1 },
+  { id: 'indicator18', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '10:50', roomID: 2 },
+  { id: 'indicator19', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '10:50', roomID: 3 },
+  { id: 'indicator20', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '10:50', roomID: 4 },
 
   // Sexto horário (11:40 - 12:30)
   { id: 'hour6', title: 'Horas', property: 'hora', customValue: '11:40 - 12:30', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator21', title: 'Temperature', property: 'temp', customValue: 30, unit: 'C', fator: 1, hora: '11:40', roomID: 1 },
-  { id: 'indicator22', title: 'Pressure', property: 'pressure', customValue: 1008, unit: 'hPa', fator: 1, hora: '11:40', roomID: 2 },
-  { id: 'indicator23', title: 'Humidity', property: 'humidity', customValue: 75, unit: '%', fator: 1, hora: '11:40', roomID: 3 },
-  { id: 'indicator24', title: 'Wind Speed', property: 'wind', customValue: 22, unit: 'km/h', fator: 1, hora: '11:40', roomID: 4 },
+  { id: 'indicator21', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '11:40', roomID: 1 },
+  { id: 'indicator22', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '11:40', roomID: 2 },
+  { id: 'indicator23', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '11:40', roomID: 3 },
+  { id: 'indicator24', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '11:40', roomID: 4 },
 
   // Sétimo horário (12:30 - 13:20)
   { id: 'hour7', title: 'Horas', property: 'hora', customValue: '12:30 - 13:20', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator25', title: 'Temperature', property: 'temp', customValue: 31, unit: 'C', fator: 1, hora: '12:30', roomID: 1 },
-  { id: 'indicator26', title: 'Pressure', property: 'pressure', customValue: 1007, unit: 'hPa', fator: 1, hora: '12:30', roomID: 2 },
-  { id: 'indicator27', title: 'Humidity', property: 'humidity', customValue: 78, unit: '%', fator: 1, hora: '12:30', roomID: 3 },
-  { id: 'indicator28', title: 'Wind Speed', property: 'wind', customValue: 25, unit: 'km/h', fator: 1, hora: '12:30', roomID: 4 },
+  { id: 'indicator25', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '12:30', roomID: 1 },
+  { id: 'indicator26', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '12:30', roomID: 2 },
+  { id: 'indicator27', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '12:30', roomID: 3 },
+  { id: 'indicator28', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '12:30', roomID: 4 },
 
   // Oitavo horário (13:20 - 14:10)
   { id: 'hour8', title: 'Horas', property: 'hora', customValue: '13:20 - 14:10', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator29', title: 'Temperature', property: 'temp', customValue: 32, unit: 'C', fator: 1, hora: '13:20', roomID: 1 },
-  { id: 'indicator30', title: 'Pressure', property: 'pressure', customValue: 1006, unit: 'hPa', fator: 1, hora: '13:20', roomID: 2 },
-  { id: 'indicator31', title: 'Humidity', property: 'humidity', customValue: 80, unit: '%', fator: 1, hora: '13:20', roomID: 3 },
-  { id: 'indicator32', title: 'Wind Speed', property: 'wind', customValue: 28, unit: 'km/h', fator: 1, hora: '13:20', roomID: 4 },
+  { id: 'indicator29', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '13:20', roomID: 1 },
+  { id: 'indicator30', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '13:20', roomID: 2 },
+  { id: 'indicator31', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '13:20', roomID: 3 },
+  { id: 'indicator32', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '13:20', roomID: 4 },
 
   // Nono horário (14:10 - 15:00)
   { id: 'hour9', title: 'Horas', property: 'hora', customValue: '14:10 - 15:00', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator33', title: 'Temperature', property: 'temp', customValue: 33, unit: 'C', fator: 1, hora: '14:10', roomID: 1 },
-  { id: 'indicator34', title: 'Pressure', property: 'pressure', customValue: 1005, unit: 'hPa', fator: 1, hora: '14:10', roomID: 2 },
-  { id: 'indicator35', title: 'Humidity', property: 'humidity', customValue: 82, unit: '%', fator: 1, hora: '14:10', roomID: 3 },
-  { id: 'indicator36', title: 'Wind Speed', property: 'wind', customValue: 30, unit: 'km/h', fator: 1, hora: '14:10', roomID: 4 },
+  { id: 'indicator33', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '14:10', roomID: 1 },
+  { id: 'indicator34', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '14:10', roomID: 2 },
+  { id: 'indicator35', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '14:10', roomID: 3 },
+  { id: 'indicator36', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '14:10', roomID: 4 },
 
   // Décimo horário (15:00 - 15:50)
   { id: 'hour10', title: 'Horas', property: 'hora', customValue: '15:00 - 15:50', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator37', title: 'Temperature', property: 'temp', customValue: 34, unit: 'C', fator: 1, hora: '15:00', roomID: 1 },
-  { id: 'indicator38', title: 'Pressure', property: 'pressure', customValue: 1004, unit: 'hPa', fator: 1, hora: '15:00', roomID: 2 },
-  { id: 'indicator39', title: 'Humidity', property: 'humidity', customValue: 85, unit: '%', fator: 1, hora: '15:00', roomID: 3 },
-  { id: 'indicator40', title: 'Wind Speed', property: 'wind', customValue: 32, unit: 'km/h', fator: 1, hora: '15:00', roomID: 4 },
+  { id: 'indicator37', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '15:00', roomID: 1 },
+  { id: 'indicator38', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '15:00', roomID: 2 },
+  { id: 'indicator39', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '15:00', roomID: 3 },
+  { id: 'indicator40', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '15:00', roomID: 4 },
 
   // Décimo primeiro horário (15:50 - 16:40)
   { id: 'hour11', title: 'Horas', property: 'hora', customValue: '15:50 - 16:40', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator41', title: 'Temperature', property: 'temp', customValue: 35, unit: 'C', fator: 1, hora: '15:50', roomID: 1 },
-  { id: 'indicator42', title: 'Pressure', property: 'pressure', customValue: 1003, unit: 'hPa', fator: 1, hora: '15:50', roomID: 2 },
-  { id: 'indicator43', title: 'Humidity', property: 'humidity', customValue: 88, unit: '%', fator: 1, hora: '15:50', roomID: 3 },
-  { id: 'indicator44', title: 'Wind Speed', property: 'wind', customValue: 34, unit: 'km/h', fator: 1, hora: '15:50', roomID: 4 },
+  { id: 'indicator41', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '15:50', roomID: 1 },
+  { id: 'indicator42', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '15:50', roomID: 2 },
+  { id: 'indicator43', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '15:50', roomID: 3 },
+  { id: 'indicator44', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '15:50', roomID: 4 },
 
   // Décimo segundo horário (16:50 - 17:40)
   { id: 'hour12', title: 'Horas', property: 'hora', customValue: '16:50 - 17:40', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator45', title: 'Temperature', property: 'temp', customValue: 36, unit: 'C', fator: 1, hora: '16:50', roomID: 1 },
-  { id: 'indicator46', title: 'Pressure', property: 'pressure', customValue: 1002, unit: 'hPa', fator: 1, hora: '16:50', roomID: 2 },
-  { id: 'indicator47', title: 'Humidity', property: 'humidity', customValue: 90, unit: '%', fator: 1, hora: '16:50', roomID: 3 },
-  { id: 'indicator48', title: 'Wind Speed', property: 'wind', customValue: 36, unit: 'km/h', fator: 1, hora: '16:50', roomID: 4 },
+  { id: 'indicator45', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '16:50', roomID: 1 },
+  { id: 'indicator46', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '16:50', roomID: 2 },
+  { id: 'indicator47', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '16:50', roomID: 3 },
+  { id: 'indicator48', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '16:50', roomID: 4 },
 
   // Décimo terceiro horário (17:40 - 18:30)
   { id: 'hour13', title: 'Horas', property: 'hora', customValue: '17:40 - 18:30', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator49', title: 'Temperature', property: 'temp', customValue: 37, unit: 'C', fator: 1, hora: '17:40', roomID: 1 },
-  { id: 'indicator50', title: 'Pressure', property: 'pressure', customValue: 1001, unit: 'hPa', fator: 1, hora: '17:40', roomID: 2 },
-  { id: 'indicator51', title: 'Humidity', property: 'humidity', customValue: 92, unit: '%', fator: 1, hora: '17:40', roomID: 3 },
-  { id: 'indicator52', title: 'Wind Speed', property: 'wind', customValue: 38, unit: 'km/h', fator: 1, hora: '17:40', roomID: 4 },
+  { id: 'indicator49', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '17:40', roomID: 1 },
+  { id: 'indicator50', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '17:40', roomID: 2 },
+  { id: 'indicator51', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '17:40', roomID: 3 },
+  { id: 'indicator52', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '17:40', roomID: 4 },
 
   // Décimo quarto horário (18:45 - 19:35)
   { id: 'hour14', title: 'Horas', property: 'hora', customValue: '18:45 - 19:35', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator53', title: 'Temperature', property: 'temp', customValue: 38, unit: 'C', fator: 1, hora: '18:45', roomID: 1 },
-  { id: 'indicator54', title: 'Pressure', property: 'pressure', customValue: 1000, unit: 'hPa', fator: 1, hora: '18:45', roomID: 2 },
-  { id: 'indicator55', title: 'Humidity', property: 'humidity', customValue: 94, unit: '%', fator: 1, hora: '18:45', roomID: 3 },
-  { id: 'indicator56', title: 'Wind Speed', property: 'wind', customValue: 40, unit: 'km/h', fator: 1, hora: '18:45', roomID: 4 },
+  { id: 'indicator53', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '18:45', roomID: 1 },
+  { id: 'indicator54', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '18:45', roomID: 2 },
+  { id: 'indicator55', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '18:45', roomID: 3 },
+  { id: 'indicator56', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '18:45', roomID: 4 },
 
   // Décimo quinto horário (19:35 - 20:25)
   { id: 'hour15', title: 'Horas', property: 'hora', customValue: '19:35 - 20:25', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator57', title: 'Temperature', property: 'temp', customValue: 39, unit: 'C', fator: 1, hora: '19:35', roomID: 1 },
-  { id: 'indicator58', title: 'Pressure', property: 'pressure', customValue: 999, unit: 'hPa', fator: 1, hora: '19:35', roomID: 2 },
-  { id: 'indicator59', title: 'Humidity', property: 'humidity', customValue: 96, unit: '%', fator: 1, hora: '19:35', roomID: 3 },
-  { id: 'indicator60', title: 'Wind Speed', property: 'wind', customValue: 42, unit: 'km/h', fator: 1, hora: '19:35', roomID: 4 },
+  { id: 'indicator57', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '19:35', roomID: 1 },
+  { id: 'indicator58', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '19:35', roomID: 2 },
+  { id: 'indicator59', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '19:35', roomID: 3 },
+  { id: 'indicator60', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '19:35', roomID: 4 },
 
   // Décimo sexto horário (20:35 - 21:25)
   { id: 'hour16', title: 'Horas', property: 'hora', customValue: '20:35 - 21:25', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator61', title: 'Temperature', property: 'temp', customValue: 40, unit: 'C', fator: 1, hora: '20:35', roomID: 1 },
-  { id: 'indicator62', title: 'Pressure', property: 'pressure', customValue: 998, unit: 'hPa', fator: 1, hora: '20:35', roomID: 2 },
-  { id: 'indicator63', title: 'Humidity', property: 'humidity', customValue: 98, unit: '%', fator: 1, hora: '20:35', roomID: 3 },
-  { id: 'indicator64', title: 'Wind Speed', property: 'wind', customValue: 44, unit: 'km/h', fator: 1, hora: '20:35', roomID: 4 },
+  { id: 'indicator61', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '20:35', roomID: 1 },
+  { id: 'indicator62', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '20:35', roomID: 2 },
+  { id: 'indicator63', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '20:35', roomID: 3 },
+  { id: 'indicator64', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '20:35', roomID: 4 },
 
   // Décimo sétimo horário (21:25 - 22:15)
   { id: 'hour17', title: 'Horas', property: 'hora', customValue: '21:25 - 22:15', unit: '', fator: 1, isLeftColumn: true },
-  { id: 'indicator65', title: 'Temperature', property: 'temp', customValue: 40, unit: 'C', fator: 1, hora: '21:25', roomID: 1 },
-  { id: 'indicator66', title: 'Pressure', property: 'pressure', customValue: 998, unit: 'hPa', fator: 1, hora: '21:25', roomID: 2 },
-  { id: 'indicator67', title: 'Humidity', property: 'humidity', customValue: 98, unit: '%', fator: 1, hora: '21:25', roomID: 3 },
-  { id: 'indicator68', title: 'Wind Speed', property: 'wind', customValue: 44, unit: 'km/h', fator: 1, hora: '21:25', roomID: 4 },
+  { id: 'indicator65', title: 'Temperature', property: 'temp', customValue: '', unit: 'C', fator: 1, hora: '21:25', roomID: 1 },
+  { id: 'indicator66', title: 'Pressure', property: 'pressure', customValue: '', unit: 'hPa', fator: 1, hora: '21:25', roomID: 2 },
+  { id: 'indicator67', title: 'Humidity', property: 'humidity', customValue: '', unit: '%', fator: 1, hora: '21:25', roomID: 3 },
+  { id: 'indicator68', title: 'Wind Speed', property: 'wind', customValue: '', unit: 'km/h', fator: 1, hora: '21:25', roomID: 4 },
 
-  // Continue até o final...
 ];
-
-
 
 export const associateTimesWithIndicators = (indicators) => {
   let currentHour = "";
   
   return indicators.map(indicator => {
-      // Se for um indicador do horário, atualize o currentHour
       if (indicator.property === "hora") {
           currentHour = indicator.customValue;
       }
 
-      // Para os outros indicadores, associe o horário atual
       if (indicator.property !== "hora") {
           return {
               ...indicator,
-              timeSlot: currentHour  // Associa o horário ao indicador
+              timeSlot: currentHour
           };
       }
 
       return indicator;
   });
 };
-
-//resolver as properties depois
 
 export const fetchProperties = async () => {
   try {

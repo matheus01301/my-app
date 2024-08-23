@@ -10,17 +10,17 @@ interface DataObject {
   fator: number;
   color?: string;
   isLeftColumn?: boolean;
-  roomID?: number;  // Adicionei roomID
-  hora?: string;    // Adicionei hora
+  roomID?: number;
+  hora?: string;
 }
 
 export const createDataWithCustomValues = (dataObjects: DataObject[]): IndicatorProps[] => {
   return dataObjects.map((data) => ({
-    id: uuidv4(),  // Gera um UUID para cada item
+    id: uuidv4(),
     title: data?.title || 'a',
     type: data?.type ? data.type : 'indicator',
     fator: data?.fator,
-    value: String(data.customValue !== null && data.customValue !== undefined ? data.customValue : ""),  // Certifica que é uma string
+    value: String(data.customValue !== null && data.customValue !== undefined ? data.customValue : ''), 
     unit: data.unit,
     size: 'custom',
     btn: [true, true],

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
 import createDataWithCustomValues from '../GridView/IndicatorData';
 import { IndicatorProps } from '../../interfaces/indicator';
-import { initialIndicators, fetchRoom } from '../utils/utils';
+import { initialIndicators, fetchRoom, getCurrentUser } from '../utils/utils';
 
 let ipcRenderer;
 if (typeof window !== 'undefined') {
@@ -14,7 +14,7 @@ interface IndicatorsContextProps {
     setIsMQTTActive: React.Dispatch<React.SetStateAction<boolean>>;
     updateIndicator: (updatedIndicator: IndicatorProps) => void;
     deleteIndicator: (id: string) => void;
-    updateRoomIndicator: (roomId: number, horario: string) => void;
+    updateRoomIndicator: (roomId: number) => void;
 }
 
 const defaultContext: IndicatorsContextProps = {
@@ -39,15 +39,14 @@ export const IndicatorsProvider = ({ children }: IndicatorsProviderProps) => {
     const [config, setConfig] = useState<any>(null);
 
     useEffect(() => {
-        console.log('Config loaded, initializing indicators...');
         const dataObjects = initialIndicators.map(indicator => ({
             ...indicator,
             color: config?.indicatorColors?.find(i => i.property === indicator.property)?.color || '#141414',
+            value: '', 
         }));
-{/* @ts-ignore */}
+        {/* @ts-ignore */}
         const initializedData = createDataWithCustomValues(dataObjects);
         setIndicatorsData(initializedData);
-        console.log('Indicators initialized:', initializedData);
     }, [config]);
 
     useEffect(() => {
@@ -89,43 +88,62 @@ export const IndicatorsProvider = ({ children }: IndicatorsProviderProps) => {
         });
     }, []);
 
-    const updateRoomIndicator = useCallback(async (roomId: number, horario: string) => {
-        console.log(`roomId: ${roomId} horario ${horario}`);
+    const updateRoomIndicator = useCallback(async (roomId: number, horario?: string) => {
         const roomData = await fetchRoom(roomId);
-        
-        if (roomData) {
-            // Extrair apenas a hora inicial do roomData.horario (se o servidor estiver enviando no formato "07:00 - 07:50")
-            const [horaInicial] = roomData.horario.split(" - ");
+        const currentUser = await getCurrentUser();
     
+        if (roomData && currentUser) {
+            const userName = currentUser.nome || "Usuário Desconhecido";
+    
+            if (horario) {
+                setIndicatorsData((prevData) => {
+                    return prevData.map((ind) => {
+                        if (ind.roomID === roomId && ind.hora === horario) {
+                            return {
+                                ...ind,
+                                value: roomData.horarios.some(h => h.horario === horario) 
+                                    ? `Agendado por: ${userName}` 
+                                    : '',
+                            };
+                        }
+                        return ind;
+                    });
+                });
+            } else {
+                roomData.horarios.forEach(({ horario }) => {
+                    setIndicatorsData((prevData) => {
+                        return prevData.map((ind) => {
+                            if (ind.roomID === roomId && ind.hora === horario) {
+                                return {
+                                    ...ind,
+                                    value: `Agendado por: ${userName}`,
+                                };
+                            }
+                            return ind;
+                        });
+                    });
+                });
+            }
+        } else if (!roomData && horario) {
             setIndicatorsData((prevData) => {
                 return prevData.map((ind) => {
-                    // Verifica se o indicador corresponde ao horário E ao id da sala
-                    if (ind.roomID === roomId && ind.hora === horaInicial) {
-                        console.log(`Atualizando indicador: ${ind.hora}, ${horaInicial}, ${roomId}`);
+                    if (ind.roomID === roomId && ind.hora === horario) {
                         return {
                             ...ind,
-                            value: `Usuário ID: ${roomData.id_usuario}`, // Exemplo de como mostrar o id_usuario
+                            value: '',
                         };
-                    } else {
-                        console.log(`Indicador não corresponde: ${ind.hora} !== ${horaInicial} ou roomId: ${ind.roomID} !== ${roomId}`);
                     }
                     return ind;
                 });
             });
-        } else {
-            console.log(`No room data found for roomId: ${roomId}`);
         }
     }, []);
-    
 
     useEffect(() => {
-        // Atualiza todos os indicadores com base nos dados iniciais
         initialIndicators.forEach(indicator => {
-            if (indicator.roomID && indicator.hora) { // Verifica se roomID e hora são válidos
-                console.log(`Processing initial indicator with roomID: ${indicator.roomID} and hora: ${indicator.hora}`);
-                updateRoomIndicator(indicator.roomID, indicator.hora);
+            if (indicator.roomID) {
+                updateRoomIndicator(indicator.roomID);
             } else {
-                console.log(`Skipping indicator with undefined roomID or hora: roomID=${indicator.roomID}, hora=${indicator.hora}`);
             }
         });
     }, [updateRoomIndicator]);

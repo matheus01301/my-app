@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { styled } from '../stitches.config';
 import GridView from '../src/components/GridView/GridView';
-import { Modal, Input, Form, Button as AntButton, Select } from 'antd';
+import { Modal, Input, Form, Tabs, Select } from 'antd';
 import { useIndicators } from '../src/components/Context/IndicatorsContext';
 import { timeSlots, rooms } from '../src/components/utils/utils';
+import { getCurrentUser, deleteRoomHorario } from '../src/components/utils/utils';
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const Container = styled('div', {
   width: '100%',
@@ -47,42 +49,74 @@ export default function HomePage() {
   const { updateRoomIndicator } = useIndicators();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [deleteForm] = Form.useForm();
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields();
+        const values = await form.validateFields();
 
-      // Extrai a hora inicial do intervalo selecionado
-      const [startTime] = values.horario.split(' - ');
+        const currentUser = await getCurrentUser();
 
-      // Envia a hora inicial ao invés do intervalo completo
-      const payload = {
-        ...values,
-        horario: startTime,
-      };
+        const payload = {
+            id_room: values.id_room,
+            id_usuario: currentUser.id_usuario,
+            horarios: values.horarios.map(horario => {
+                const firstPart = horario.split(' - ')[0];
+                return { horario: firstPart };
+            }),
+        };
 
-      // Faça o POST para criar a nova sala
-      await fetch('http://127.0.0.1:8000/room/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+        const token = localStorage.getItem('token');
+        console.log(payload);
 
-      // Feche o modal
-      setIsModalVisible(false);
+        const response = await fetch('http://127.0.0.1:8000/room/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+        });
 
-      // Limpe o formulário
-      form.resetFields();
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Failed to create room:', errorData);
+            return;
+        }
+
+        const data = await response.json();
+
+        values.horarios.forEach(horario => {
+            updateRoomIndicator(values.id_room);
+        });
+
+        setIsModalVisible(false);
+
+        form.resetFields();
     } catch (error) {
-      console.error('Failed to create room:', error);
+        console.error('Failed to create room:', error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+        const values = await deleteForm.validateFields();
+
+        await deleteRoomHorario(values.id_room, values.horario);
+        {/* @ts-ignore */}
+        updateRoomIndicator(values.id_room, values.horario);
+
+        setIsModalVisible(false);
+        deleteForm.resetFields();
+    } catch (error) {
+        console.error('Failed to delete room horario:', error);
+    }
+};
 
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    deleteForm.resetFields();
   };
 
   return (
@@ -98,48 +132,88 @@ export default function HomePage() {
       </div>
 
       <Modal
-        title="Create New Room"
+        title="Gerenciar Agendamentos"
         visible={isModalVisible}
-        onOk={handleOk}
         onCancel={handleCancel}
-        okText="Create"
-        cancelText="Cancel"
+        footer={null}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            label="Horário"
-            name="horario"
-            rules={[{ required: true, message: 'Please select the horário!' }]}
-          >
-            <Select placeholder="Select a time slot">
-              {timeSlots.map((slot) => (
-                <Option key={slot} value={slot}>
-                  {slot}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="ID da Sala"
-            name="id_room"
-            rules={[{ required: true, message: 'Please select the room!' }]}
-          >
-            <Select placeholder="Select a room">
-              {rooms.map((room) => (
-                <Option key={room.id} value={room.id}>
-                  {room.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="ID do Usuário"
-            name="id_usuario"
-            rules={[{ required: true, message: 'Please input the user ID!' }]}
-          >
-            <Input placeholder="e.g., 1" />
-          </Form.Item>
-        </Form>
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Criar Agendamento" key="1">
+            <Form form={form} layout="vertical" onFinish={handleOk}>
+              <Form.Item
+                label="Horários"
+                name="horarios"
+                rules={[{ required: true, message: 'Please select the horários!' }]}
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Select time slots"
+                >
+                  {timeSlots.map((slot) => (
+                    <Option key={slot} value={slot}>
+                      {slot}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="ID da Sala"
+                name="id_room"
+                rules={[{ required: true, message: 'Please select the room!' }]}
+              >
+                <Select placeholder="Select a room">
+                  {rooms.map((room) => (
+                    <Option key={room.id} value={room.id}>
+                      {room.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                {/* @ts-ignore */}
+                <Button type="primary" htmlType="submit">
+                  Criar Agendamento
+                </Button>
+              </Form.Item>
+            </Form>
+          </TabPane>
+          <TabPane tab="Deletar Agendamento" key="2">
+            <Form form={deleteForm} layout="vertical" onFinish={handleDelete}>
+              <Form.Item
+                label="Horário"
+                name="horario"
+                rules={[{ required: true, message: 'Please select the horário to delete!' }]}
+              >
+                <Select placeholder="Select a time slot">
+                  {timeSlots.map((slot) => (
+                    <Option key={slot} value={slot.split(' - ')[0]}>
+                      {slot}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="ID da Sala"
+                name="id_room"
+                rules={[{ required: true, message: 'Please select the room!' }]}
+              >
+                <Select placeholder="Select a room">
+                  {rooms.map((room) => (
+                    <Option key={room.id} value={room.id}>
+                      {room.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                {/* @ts-ignore */}
+                <Button type="primary" htmlType="submit" danger>
+                  Deletar Agendamento
+                </Button>
+              </Form.Item>
+            </Form>
+          </TabPane>
+        </Tabs>
       </Modal>
     </React.Fragment>
   );
