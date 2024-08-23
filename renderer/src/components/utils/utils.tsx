@@ -117,33 +117,6 @@ export const fetchInitializationData = async () => {
   return initializationPromise;
 };
 
-export const loginUser = async (username: string, password: string) => {
-  try {
-    const response = await fetch('http://127.0.0.1:8088/wellexds/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'password',
-        username: username,
-        password: password,
-        scope: '',
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to login');
-    }
-
-    const data = await response.json();
-    return data.access_token;
-  } catch (error) {
-    console.error('Error during login:', error);
-    throw error;
-  }
-};
-
 export const getUserPermission = async (accessToken: string) => {
   try {
     const response = await fetch('http://127.0.0.1:8088/wellexds/logado', {
@@ -187,26 +160,102 @@ export async function fetchRoom(roomId: number) {
   }
 }
 
-export async function createUser(nome: string, matricula: number, senha: string) {
-    try {
-        const response = await fetch('http://127.0.0.1:8000/user/usuario', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nome, matricula, senha }),
+export async function loginUser(matricula: string, senha: string) {
+  try {
+      const response = await fetch('http://127.0.0.1:8000/user/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+              username: matricula,
+              password: senha,
+          }),
       });
-  
+
       if (!response.ok) {
-        throw new Error('Erro na criação do usuário');
+          throw new Error('Network response was not ok');
       }
-  
-      return await response.json();
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      throw error;
-    }
+
+      const data = await response.json();
+      console.log('Login data:', data);
+      return data;
+  } catch (error) {
+      console.error('Error logging in:', error);
   }
+}
+
+export async function createUser(nome: string, matricula: number, senha: string) {
+  try {
+      const response = await fetch('http://127.0.0.1:8000/user/usuario/', { 
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, matricula, senha }),
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('User created:', data);
+      return data;
+  } catch (error) {
+      console.error('Error creating user:', error);
+  }
+}
+
+export async function getCurrentUser() {
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/user/usuario/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch current user');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+  }
+}
+
+export const timeSlots = [
+  "07:00 - 07:50",
+  "07:50 - 08:40",
+  "08:55 - 09:45",
+  "09:45 - 10:35",
+  "10:50 - 11:40",
+  "11:40 - 12:30",
+  "12:30 - 13:20",
+  "13:20 - 14:10",
+  "14:10 - 15:00",
+  "15:00 - 15:50",
+  "15:50 - 16:40",
+  "16:50 - 17:40",
+  "17:40 - 18:30",
+  "18:45 - 19:35",
+  "19:35 - 20:25",
+  "20:35 - 21:25",
+  "21:25 - 22:15"
+];
+
+export const rooms = [
+  { id: 1, name: 'Sala 1' },
+  { id: 2, name: 'Sala 2' },
+  { id: 3, name: 'Sala 3' },
+  { id: 4, name: 'Sala 4' },
+];
 
 export const fetchAlarms = async () => {
   const lab_number = getLabNumber();

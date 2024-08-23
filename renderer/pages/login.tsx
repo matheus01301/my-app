@@ -45,7 +45,7 @@ const Button = styled('button', {
   width: '100%',
   padding: '10px',
   backgroundColor: '#1A73E8',
-  color: '#000',
+  color: 'white',
   borderRadius: '5px',
   border: 'none',
   fontSize: '16px',
@@ -64,10 +64,9 @@ const ErrorMessage = styled('div', {
 
 export default function AuthScreen() {
   const [username, setUsername] = useState('');
-  const [matricula, setMatricula] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isCreatingUser, setIsCreatingUser] = useState(false); // Estado para alternar entre login e criação de usuário
+  const [isCreatingUser, setIsCreatingUser] = useState(false); 
 
   const handleLogin = async () => {
     if (username === '' || password === '') {
@@ -76,7 +75,8 @@ export default function AuthScreen() {
     }
 
     try {
-      // Sua lógica de login
+      const response = await loginUser(username, password); // Chama a função de login
+      localStorage.setItem('token', response.access_token); // Armazena o token JWT no localStorage
       ipcRenderer.send('load-main'); // Agora, pode-se carregar a interface principal
     } catch (error) {
       console.error('Erro durante o login:', error);
@@ -85,21 +85,27 @@ export default function AuthScreen() {
   };
 
   const handleCreateUser = async () => {
-    if (username === '' || matricula === '' || password === '') {
-      setError('Todos os campos são obrigatórios');
+    if (username === '' || password === '') {
+      setError('Nome e Password são obrigatórios');
       return;
     }
-
+  
     try {
-      const matriculaInt = parseInt(matricula, 10);  // Converte matricula para número
-      await createUser(username, matriculaInt, password);
-      alert('Usuário criado com sucesso!');
-      setIsCreatingUser(false); // Volta para a tela de login
+      const matricula = Math.floor(Math.random() * 1000000000); // Exemplo para gerar uma matrícula aleatória
+      const response = await createUser(username, matricula, password);
+  
+      if (response && response.id_usuario) {
+        alert('Usuário criado com sucesso!');
+        setIsCreatingUser(false); // Volta para a tela de login
+      } else {
+        setError('Falha na criação do usuário. Resposta inesperada do servidor.');
+      }
     } catch (error) {
       console.error('Erro durante a criação do usuário:', error);
-      setError('Falha na criação do usuário.');
+      setError('Falha na criação do usuário. Por favor, tente novamente mais tarde.');
     }
   };
+  
 
   return (
     <Container>
@@ -111,14 +117,6 @@ export default function AuthScreen() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        {isCreatingUser && (
-          <Input
-            type="text"
-            placeholder="Matrícula"
-            value={matricula}
-            onChange={(e) => setMatricula(e.target.value)}
-          />
-        )}
         <Input
           type="password"
           placeholder="Password"

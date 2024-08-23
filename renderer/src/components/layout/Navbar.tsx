@@ -3,52 +3,38 @@ import { AppstoreOutlined, SettingOutlined, PlusOutlined, CalendarOutlined, Cloc
 import { styled } from '../../../../renderer/stitches.config';
 import logo from '../../../public/images/logomono.png';
 import { useRouter } from 'next/router';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Avatar } from 'antd';
 import ModalComponent from './ModalComponent';
 import Alarms from './Alarms';
+import { getCurrentUser } from '../utils/utils';
 
 const { Header, Sider, Content } = Layout;
 
+const UserContainer = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '10px',
+  backgroundColor: '#001529',
+  color: 'white',
+});
+
+const UserName = styled('div', {
+  marginLeft: '10px',
+  fontSize: '16px',
+});
+
 export default function LayoutComponent({ ...props }) {
   const [current, setCurrent] = useState('/home');
+  const [user, setUser] = useState(null);
   const router = useRouter();
-  const [date, setDate] = useState(new Date());
-  const [isAlarmsModalVisible, setIsAlarmsModalVisible] = useState(false);
-  const [isPreferencesModalVisible, setIsPreferencesModalVisible] = useState(false);
-  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
-
-  const showAlarmsModal = () => {
-    setIsAlarmsModalVisible(true);
-  };
-
-  const closeAlarmsModal = () => {
-    setIsAlarmsModalVisible(false);
-  };
-
-  const showPreferencesModal = () => {
-    setIsPreferencesModalVisible(true);
-  };
-
-  const closePreferencesModal = () => {
-    setIsPreferencesModalVisible(false);
-  };
-
-  const showExportModal = () => {
-    setIsExportModalVisible(true);
-  };
-
-  const closeExportModal = () => {
-    setIsExportModalVisible(false);
-  };
-
-  const handleOk = () => {
-    setIsAlarmsModalVisible(false);
-    setIsPreferencesModalVisible(false);
-    setIsExportModalVisible(false);
-  };
 
   useEffect(() => {
-    setInterval(() => setDate(new Date()), 30000);
+    async function fetchUser() {
+      const userData = await getCurrentUser();
+      setUser(userData);
+    }
+
+    fetchUser();
   }, []);
 
   const onClick = (e) => {
@@ -58,51 +44,46 @@ export default function LayoutComponent({ ...props }) {
 
   return (
     <Layout>
-        <Sider>
-          <Menu
-            mode="inline"
-            selectedKeys={[current]}
-            onClick={onClick}
-            style={{ height: '100vh', borderRight: 0 }}
-          >
-            <Menu.Item key="/home" icon={<AppstoreOutlined />}>
-              Home
-            </Menu.Item>
-            <Menu.Item key="/alarms" icon={<BellOutlined />}>
-              Alarms
-            </Menu.Item>
-            <Menu.Item key="/calendar" icon={<CalendarOutlined />}>
-              Calendar
-            </Menu.Item>
-            <Menu.Item key="/clock" icon={<ClockCircleOutlined />}>
-              Clock
-            </Menu.Item>
-            <Menu.Item key="/preferences" icon={<SettingOutlined />}>
-              Preferences
-            </Menu.Item>
-            <Menu.Item key="/help" icon={<QuestionOutlined />}>
-              Help
-            </Menu.Item>
-            <Menu.Item key="/export" icon={<DownloadOutlined />}>
-              Export
-            </Menu.Item>
-            <ModalComponent
-            button={{
-              title: <>
-                <BellOutlined style={{ marginRight: '10px' }} />
-                Alarms
-              </>
-            }}
-            visible={isAlarmsModalVisible}
-            onCancel={closeAlarmsModal}
-            onOk={handleOk}
-            showModal={showAlarmsModal}
-          >
-            {/* @ts-ignore */}
-            <Alarms />
-          </ModalComponent>
-          </Menu>
-        </Sider>
-      </Layout>
+      <Sider>
+        <UserContainer>
+          {user ? (
+            <>
+              <Avatar>{user.nome.charAt(0).toUpperCase()}</Avatar>
+              <UserName>{user.nome}</UserName>
+            </>
+          ) : (
+            'Loading...'
+          )}
+        </UserContainer>
+        <Menu
+          mode="inline"
+          selectedKeys={[current]}
+          onClick={onClick}
+          style={{ height: '100vh', borderRight: 0 }}
+        >
+          <Menu.Item key="/home" icon={<AppstoreOutlined />}>
+            Home
+          </Menu.Item>
+          <Menu.Item key="/alarms" icon={<BellOutlined />}>
+            Alarms
+          </Menu.Item>
+          <Menu.Item key="/calendar" icon={<CalendarOutlined />}>
+            Calendar
+          </Menu.Item>
+          <Menu.Item key="/clock" icon={<ClockCircleOutlined />}>
+            Clock
+          </Menu.Item>
+          <Menu.Item key="/preferences" icon={<SettingOutlined />}>
+            Preferences
+          </Menu.Item>
+          <Menu.Item key="/help" icon={<QuestionOutlined />}>
+            Help
+          </Menu.Item>
+          <Menu.Item key="/export" icon={<DownloadOutlined />}>
+            Export
+          </Menu.Item>
+        </Menu>
+      </Sider>
+    </Layout>
   );
 };

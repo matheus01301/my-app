@@ -3,6 +3,7 @@ import { styled } from '../stitches.config';
 import GridView from '../src/components/GridView/GridView';
 import { Modal, Input, Form, Button as AntButton, Select } from 'antd';
 import { useIndicators } from '../src/components/Context/IndicatorsContext';
+import { timeSlots, rooms } from '../src/components/utils/utils';
 
 const { Option } = Select;
 
@@ -83,33 +84,6 @@ export default function HomePage() {
     setIsModalVisible(false);
     form.resetFields();
   };
-
-  const timeSlots = [
-    "07:00 - 07:50",
-    "07:50 - 08:40",
-    "08:55 - 09:45",
-    "09:45 - 10:35",
-    "10:50 - 11:40",
-    "11:40 - 12:30",
-    "12:30 - 13:20",
-    "13:20 - 14:10",
-    "14:10 - 15:00",
-    "15:00 - 15:50",
-    "15:50 - 16:40",
-    "16:50 - 17:40",
-    "17:40 - 18:30",
-    "18:45 - 19:35",
-    "19:35 - 20:25",
-    "20:35 - 21:25",
-    "21:25 - 22:15"
-  ];
-
-  const rooms = [
-    { id: 1, name: 'Sala 1' },
-    { id: 2, name: 'Sala 2' },
-    { id: 3, name: 'Sala 3' },
-    { id: 4, name: 'Sala 4' },
-  ];
 
   return (
     <React.Fragment>
